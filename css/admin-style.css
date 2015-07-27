@@ -1,0 +1,44 @@
+.admin-section {
+  margin: 0 auto;
+  width: 600px;
+}
+
+.admin-section a {
+  font-size: 18px;
+}
+
+form.admin-form {
+  margin: 0 auto;
+  width: 400px;
+}
+
+form.admin-form input {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+}
+
+form.admin-form label {
+  display: block;
+  padding: 0px;
+  font-size: 22px;
+}
+
+form.admin-form input[type="text"],
+form.admin-form input[type="password"] {
+  font-size: 16px;
+  padding: 10px;
+}
+
+form.admin-form input[type="submit"] {
+  border: 0;
+  background: #ccc;
+  padding: 5px;
+  font-size: 36px;
+  font-family: 'Indie Flower', cursive;
+}
+
+form.admin-form input[type="submit"]:hover {
+  background: #ddd;
+  cursor: pointer;
+}

@@ -13,7 +13,7 @@ include_once('connection.php');
     {
       $posts = array();
       $link = connect_to_db();
-      $query = "SELECT title FROM posts" or die("Error in the consult.." . mysqli_error($link));
+      $query = "SELECT * FROM posts" or die("Error in the consult.." . mysqli_error($link));
       $result = $link->query( $query );
 
       if (!$result)
