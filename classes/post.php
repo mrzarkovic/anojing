@@ -1,15 +1,13 @@
 <?php
 
-include_once('connection.php');
-
-  class Site
+  class Post
   {
     function __construct()
     {
 
     }
 
-    public function get_posts()
+    public function getPosts()
     {
       $posts = array();
       $link = connect_to_db();

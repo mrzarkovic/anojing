@@ -1,14 +1,18 @@
 <?php
 
-include_once('../connection.php');
 session_start();
+$_SESSION['errors'] = array();
+$_SESSION['newPostAdded'] = false;
+$_SESSION['notifications'] = array();
 
   class Admin
   {
 
+    public $admin_page = "index";
+
     function __construct()
     {
-      $this->post_successfull = false;
+
       if ( ( isset( $_POST['action'] ) ) && ( $_POST['action'] == "login" ) )
       {
         $username = $_POST['username'];
@@ -16,20 +20,71 @@ session_start();
         $password = $_POST['password'];
         $password = mysql_escape_string( $password );
 
-        $this->login( $username, $password );
+        //$this->createAdmin();
+
+        if ( !$this->login( $username, $password ) )
+        {
+          $error['login'] = "Login failed";
+          $_SESSION['errors'] = $error;
+        }
       }
-      elseif ( ( isset( $_GET['log_out'] ) ) && ( $_GET['log_out'] == true ) )
+      elseif ( ( isset( $_GET['action'] ) ) && ( $_GET['action'] == "log_out" ) )
       {
         $this->logout();
       }
-      elseif ( ( isset( $_POST['action'] ) ) && ( $_POST['action'] == "new-post" ) )
+      elseif ( ( isset( $_POST['action'] ) ) && ( $_POST['action'] == "new_post" ) )
       {
         if ( $this->newPost() )
         {
-          $_SESSION["newPostAdded"] = true;
+          $_SESSION['newPostAdded'] = true;
+        }
+        else {
+          $error['new-post'] = "Upload failed.";
+          $_SESSION['errors'] = $error;
+        }
+      }
+      elseif ( ( isset( $_GET['page'] ) ) && ( $_GET['page'] == "list_posts" ) )
+      {
+        $this->admin_page = "list_posts";
+        if ( ( isset( $_GET['action'] ) ) && ( $_GET['action'] == "delete_post" ) )
+        {
+          if ( !isset($_GET['id']) || !$post_id = $_GET['id'])
+          {
+            $error['delete-post'] = "There has been an error.";
+            $_SESSION['errors'] = $error;
+            return 0;
+          }
+          if ( $this->deletePost( $post_id ) )
+          {
+            $notification['delete-post'] = "Post has been deleted.";
+            $_SESSION['notifications'] = $notification;
+          }
+          else
+          {
+            $error['delete-post'] = "There has been an error.";
+            $_SESSION['errors'] = $error;
+          }
         }
       }
 
+    }
+
+    public function getPage()
+    {
+      return $this->admin_page;
+    }
+
+    private function createAdmin()
+    {
+      $name = "admin";
+      $pass = md5( "topsecret321?" );
+
+      $link = connect_to_db();
+      $query = "INSERT INTO users (name, pass) VALUES ('$name','$pass')" or die( "Error in the consult.." . mysqli_error($link) );
+      $result = $link->query( $query );
+
+      if ( !$result )
+        return 0;
     }
 
     private function login( $username = "", $password = "" )
@@ -47,7 +102,7 @@ session_start();
       while( $user = mysqli_fetch_object( $result ) )
       {
         if ( $user->name == $username )
-          if ( $user->pass == $password )
+          if ( $user->pass == md5( $password ) )
           {
             $user->logged_id = true;
             $_SESSION["user"] = $user;
@@ -70,8 +125,12 @@ session_start();
       $upload_ok = 1;
       $file_type = pathinfo( $target_file, PATHINFO_EXTENSION );
 
-      $check = getimagesize( $_FILES["photo"]["tmp_name"] );
-      if( $check == true )
+      if ( $_FILES["photo"]["tmp_name"] == "" )
+      {
+        return false;
+      }
+
+      if( $check = getimagesize( $_FILES["photo"]["tmp_name"] ) )
       {
         $link = connect_to_db();
 
@@ -119,6 +178,18 @@ session_start();
       return false;
     }
 
+    private function deletePost( $id = 0 )
+    {
+        $link = connect_to_db();
+        $query = "DELETE FROM posts WHERE id='$id'" or die("Error in the consult.." . mysqli_error($link));
+        $result = $link->query( $query );
+
+        if ( !$result )
+          return 0;
+
+        return true;
+    }
+
     public function loggedIn()
     {
       if ( isset( $_SESSION["user"] ) )
@@ -127,12 +198,27 @@ session_start();
       return false;
     }
 
+    public function getErrors()
+    {
+      if ( isset( $_SESSION["errors"]) )
+        return $_SESSION["errors"];
+
+      return false;
+    }
+
+    public function getNotifications()
+    {
+      if ( isset( $_SESSION["notifications"]) )
+        return $_SESSION["notifications"];
+
+      return false;
+    }
+
     public function newPostAdded()
     {
-      if ( isset( $_SESSION["newPostAdded"] ) )
+      if ( isset( $_SESSION['newPostAdded'] ) )
       {
-        unset($_SESSION["newPostAdded"]);
-        return true;
+        return $_SESSION['newPostAdded'];
       }
 
       return false;

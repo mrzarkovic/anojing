@@ -7,6 +7,16 @@
   font-size: 18px;
 }
 
+section.admin-section article {
+  margin: 10px;
+  padding: 5px;
+  float: left;
+}
+
+section.admin-section article img {
+  max-width: 150px;
+}
+
 form.admin-form {
   margin: 0 auto;
   width: 400px;
