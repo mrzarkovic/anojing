@@ -1,35 +1,40 @@
+
 <?php
-  include_once('connection.php');
-  include_once('classes/post.php');
-?>
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Ziro Faks</title>
-    <link rel="stylesheet" href="css/style.css" media="screen" charset="utf-8">
-  </head>
-  <body>
-    <section>
-      <h1>All of my <span>faks</span>!</h1>
-      <h2>just look at them, <a href="og/">or add some..</a></h2>
-      <?php
-        $post = new Post();
-        $posts = $post->getPosts();
-        if ( $posts && isset($posts) ):
-          foreach ( $posts as $post ):
-      ?>
-      <article>
-        <?php if ( $post->title != "" ) : ?>
-        <h1><?php echo $post->title; ?></h1>
-        <?php endif; ?>
-        <img src="photos/<?php echo $post->photo_name; ?>"/>
-      </article>
-      <?php
-          endforeach;
-        endif;
-      ?>
-      <p>© 2015.</p>
-    </section>
-  </body>
-</html>
+
+function connect_to_db()
+{
+  $link = mysqli_connect("localhost","root","","anojing") or die("Error " . mysqli_error($link));
+  return $link;
+}
+
+include_once('classes/entries.php');
+
+$entries = new Entries();
+$entries = $entries->getEntries();
+
+var_dump($entries);
+
+// Error reporting is turned up to 11 for the purposes of this demo
+ini_set("display_errors",1);
+ERROR_REPORTING(E_ALL);
+
+// Exception handling
+set_exception_handler('exception_handler');
+function exception_handler( $exception )
+{
+  echo $exception->getMessage();
+}
+
+// Load the Template class
+require_once 'classes/template.php';
+
+// Create a new instance of the Template class
+$template = new Template;
+
+// Set the testing template file location
+$template->template_file = 'template-test.inc';
+
+$template->entries[] = (object) array( 'test' => 'This was inserted using template tags!' );
+
+// Output the template markup
+echo $template->generate_markup();

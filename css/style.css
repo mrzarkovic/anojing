@@ -21,6 +21,13 @@ html {
   box-sizing: inherit;
 }
 
+pre {
+  font-size: 15px;
+  padding: 10px 50px;
+  background: #fff;
+  border-bottom: 1px dashed #333;
+}
+
 a.link {
   color: #333;
   padding: 0 10px;

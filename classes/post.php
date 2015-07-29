@@ -4,7 +4,7 @@
   {
     function __construct()
     {
-
+      echo "this is Post controller";
     }
 
     public function getPosts()

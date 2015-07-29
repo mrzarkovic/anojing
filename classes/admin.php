@@ -12,7 +12,7 @@ $_SESSION['notifications'] = array();
 
     function __construct()
     {
-
+      echo "this is Admin controller";
       if ( ( isset( $_POST['action'] ) ) && ( $_POST['action'] == "login" ) )
       {
         $username = $_POST['username'];
