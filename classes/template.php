@@ -71,12 +71,6 @@ class Template
    */
   private function _parse_template( $extra=NULL )
   {
-    //TODO: Process each entry and insert its values into the loop
-
-    //TODO: If extra data was passed to fill in the header/footer, parse it here
-
-    //TODO: Return the formatted entries with the header and footer
-
     // Create an alias of the template file property to save space
     $template = $this->_template;
 
@@ -115,8 +109,17 @@ class Template
       $markup .= preg_replace_callback( $tag_pattern, $callback( serialize( $this->entries[$i] ) ), $entry_template );
     }
 
-    // TEMPORARY: Output the markup after replacing template tags
-    return $markup;
+    // If extra data was passed to fill in the header/footer, parse it here
+    if( is_object($extra) )
+    {
+      foreach( $extra as $key => $props )
+      {
+        $$key = preg_replace_callback( $tag_pattern, $callback( serialize( $extra->$key ) ), $$key );
+      }
+    }
+
+    // Return the formatted entries with the header and footer reattached
+    return $header . $markup . $footer;
   }
 
   /**
@@ -184,8 +187,4 @@ class Template
       return create_function('',' \$a = func_get_args(); \$z = ' . \$args . '; \$a = array_merge(\$z,\$a); return call_user_func_array(\'$function\', \$a);');
     ");
   }
-
- //TODO: Write a static method to replace the template tags with entry data
-
- //TODO: Write a private currying function to facilitate tag replacement
 }

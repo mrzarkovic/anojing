@@ -35,6 +35,10 @@ $template = new Template;
 $template->template_file = 'template-test.inc';
 
 $template->entries[] = (object) array( 'test' => 'This was inserted using template tags!' );
+$extra = (object) array(
+  'header' => (object) array( 'headerStuff' => 'Some extra content.' ),
+  'footer' => (object) array( 'footerStuff' => 'More extra content.' )
+);
 
 // Output the template markup
-echo $template->generate_markup();
+echo $template->generate_markup($extra);
