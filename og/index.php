@@ -66,9 +66,12 @@
           }
           else
           {
-            if ( $admin->newPostAdded() )
+            if ( $notifications = $admin->getNotifications() )
             {
-              echo "<div class='note'>Post added.</div>";
+              foreach ( $notifications as $notification )
+              {
+                echo "<div class='note'>" . $notification . "</div>";
+              }
             }
             elseif ( $errors = $admin->getErrors() )
             {

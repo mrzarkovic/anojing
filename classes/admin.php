@@ -2,13 +2,13 @@
 
 session_start();
 $_SESSION['errors'] = array();
-$_SESSION['newPostAdded'] = false;
+//$_SESSION['newPostAdded'] = false;
 $_SESSION['notifications'] = array();
 
   class Admin
   {
 
-    public $admin_page = "index";
+    public $admin_page = "";
 
     function __construct()
     {
@@ -34,9 +34,12 @@ $_SESSION['notifications'] = array();
       }
       elseif ( ( isset( $_POST['action'] ) ) && ( $_POST['action'] == "new_post" ) )
       {
+        $this->admin_page = "new_post";
         if ( $this->newPost() )
         {
-          $_SESSION['newPostAdded'] = true;
+          //$_SESSION['newPostAdded'] = true;
+          $notification['new-post'] = "Post added.";
+          $_SESSION['notifications'] = $notification;
         }
         else {
           $error['new-post'] = "Upload failed.";
@@ -213,7 +216,7 @@ $_SESSION['notifications'] = array();
 
       return false;
     }
-
+/*
     public function newPostAdded()
     {
       if ( isset( $_SESSION['newPostAdded'] ) )
@@ -223,6 +226,6 @@ $_SESSION['notifications'] = array();
 
       return false;
     }
-
+*/
   }
  ?>
