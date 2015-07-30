@@ -6,6 +6,13 @@
 
   This is content that should be displayed.
   {test}
+  <ul>
+  {% for element in array %}
+    <li>
+      {element}
+    </li>
+  {% endfor %}
+  </ul>
 
 {/loop}
 

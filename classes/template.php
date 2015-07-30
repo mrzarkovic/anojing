@@ -73,13 +73,17 @@ class Template
   {
     // Create an alias of the template file property to save space
     $template = $this->_template;
-
     // Remove any PHP-style comments from the template
     $comment_pattern = array('#/\*.*?\*/#s', '#(?<!:)//.*#');
     $template = preg_replace($comment_pattern, NULL, $template);
 
     // Extract the main entry loop from the file
     $pattern = '#.*{loop}(.*?){/loop}.*#is';
+    $entry_template = preg_replace($pattern, "$1", $template);
+
+    // Extract foreach loops
+    $loops = array();
+    $loop_pattern = '#.*{loop}(.*?){/loop}.*#is';
     $entry_template = preg_replace($pattern, "$1", $template);
 
     // Extract the header from the template if one exists
