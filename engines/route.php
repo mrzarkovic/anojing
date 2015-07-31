@@ -67,5 +67,6 @@ class Route
         }
       }
     }
+    throw new Exception( 'Error 404: Page not found.' );
   }
 }

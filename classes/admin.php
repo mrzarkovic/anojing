@@ -1,6 +1,5 @@
 <?php
 
-session_start();
 $_SESSION['errors'] = array();
 //$_SESSION['newPostAdded'] = false;
 $_SESSION['notifications'] = array();
@@ -29,11 +28,12 @@ $_SESSION['notifications'] = array();
           $_SESSION['errors'] = $error;
         }
       }
-      else*/
+      else
       if ( ( isset( $_GET['action'] ) ) && ( $_GET['action'] == "log_out" ) )
       {
         $this->logout();
       }
+
       elseif ( ( isset( $_POST['action'] ) ) && ( $_POST['action'] == "new_post" ) )
       {
         $this->admin_page = "new_post";
@@ -48,7 +48,7 @@ $_SESSION['notifications'] = array();
           $_SESSION['errors'] = $error;
         }
       }
-      elseif ( ( isset( $_GET['page'] ) ) && ( $_GET['page'] == "list_posts" ) )
+      else*/if ( ( isset( $_GET['page'] ) ) && ( $_GET['page'] == "list_posts" ) )
       {
         $this->admin_page = "list_posts";
         if ( ( isset( $_GET['action'] ) ) && ( $_GET['action'] == "delete_post" ) )
@@ -76,6 +76,13 @@ $_SESSION['notifications'] = array();
 
     public function showLogin()
     {
+
+      $admin = new Admin();
+      if( $this->loggedIn() )
+      {
+        header('Location: /new-post');
+      }
+
       $this->setTemplate('admin/login.inc');
 
       if ( ( isset( $_POST['action'] ) ) && ( $_POST['action'] == "login" ) )
@@ -89,13 +96,13 @@ $_SESSION['notifications'] = array();
 
         if ( !$this->login( $username, $password ) )
         {
-          $error['login'] = "Login failed";
-          $_SESSION['errors'] = $error;
-          echo "wrong credentials.";
+          $error = (object) array( "error" => "Login failed.");
+          $this->template->entries[] = $error;
         }
         else
         {
           echo "you are logged in.";
+          header('Location: /new-post');
         }
       }
 
@@ -145,12 +152,12 @@ $_SESSION['notifications'] = array();
       return false;
     }
 
-    private function logout()
+    public function logout()
     {
       session_destroy();
-      header('Location: index.php');
+      header('Location: /');
     }
-
+/*
     private function newPost()
     {
       $target_dir = "../photos/";
@@ -210,7 +217,7 @@ $_SESSION['notifications'] = array();
 
       return false;
     }
-
+*/
     private function deletePost( $id = 0 )
     {
         $link = connect_to_db();
@@ -223,21 +230,8 @@ $_SESSION['notifications'] = array();
         return true;
     }
 
-    public function loggedIn()
-    {
-      if ( isset( $_SESSION["user"] ) )
-        return true;
 
-      return false;
-    }
 
-    public function getErrors()
-    {
-      if ( isset( $_SESSION["errors"]) )
-        return $_SESSION["errors"];
-
-      return false;
-    }
 
     public function getNotifications()
     {

@@ -1,10 +1,10 @@
 <section class="admin-section">
   <h1>Credentials</h1>
   {loop}
-    <div class="error">{login}</div>
+    <div class="error">{error}</div>
   {/loop}
 
-  <form class="admin-form" action="/admin" method="post">
+  <form class="admin-form" action="/login" method="post">
     <input type="hidden" name="action" value="login">
     <label for="username">The name</label>
     <input type="text" name="username" id="username" value="">

@@ -12,7 +12,13 @@
 
   //$route = new Route();
   $core->route->add('/', 'showPosts@Post');
-  $core->route->add('/admin', 'showLogin@Admin');
+  $core->route->add('/new-post', 'addPost@Post');
+  $core->route->add('/list-posts', 'listPosts@Post');
+  $core->route->add('/login', 'showLogin@Admin');
+  $core->route->add('/logout', 'logout@Admin');
+  $core->route->add('/hello', function(){
+    echo "Hello.";
+  });
 
 ?>
 <!DOCTYPE html>
