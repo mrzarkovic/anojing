@@ -5,14 +5,15 @@ $_SESSION['errors'] = array();
 //$_SESSION['newPostAdded'] = false;
 $_SESSION['notifications'] = array();
 
-  class Admin
+  class Admin extends Core
   {
 
     public $admin_page = "";
 
     function __construct()
     {
-      echo "this is Admin controller";
+      parent::__construct();
+/*
       if ( ( isset( $_POST['action'] ) ) && ( $_POST['action'] == "login" ) )
       {
         $username = $_POST['username'];
@@ -28,7 +29,8 @@ $_SESSION['notifications'] = array();
           $_SESSION['errors'] = $error;
         }
       }
-      elseif ( ( isset( $_GET['action'] ) ) && ( $_GET['action'] == "log_out" ) )
+      else*/
+      if ( ( isset( $_GET['action'] ) ) && ( $_GET['action'] == "log_out" ) )
       {
         $this->logout();
       }
@@ -72,6 +74,34 @@ $_SESSION['notifications'] = array();
 
     }
 
+    public function showLogin()
+    {
+      $this->setTemplate('admin/login.inc');
+
+      if ( ( isset( $_POST['action'] ) ) && ( $_POST['action'] == "login" ) )
+      {
+        $username = $_POST['username'];
+        $username = mysql_escape_string( $username );
+        $password = $_POST['password'];
+        $password = mysql_escape_string( $password );
+
+        //$this->createAdmin();
+
+        if ( !$this->login( $username, $password ) )
+        {
+          $error['login'] = "Login failed";
+          $_SESSION['errors'] = $error;
+          echo "wrong credentials.";
+        }
+        else
+        {
+          echo "you are logged in.";
+        }
+      }
+
+      echo $this->template->generate_markup();
+    }
+
     public function getPage()
     {
       return $this->admin_page;
@@ -100,12 +130,12 @@ $_SESSION['notifications'] = array();
         return 0;
 
       $users = array();
-      //$password = md5($password);
 
+      $password = md5( $password );
       while( $user = mysqli_fetch_object( $result ) )
       {
         if ( $user->name == $username )
-          if ( $user->pass == md5( $password ) )
+          if ( $user->pass == $password )
           {
             $user->logged_id = true;
             $_SESSION["user"] = $user;

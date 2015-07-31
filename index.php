@@ -1,44 +1,29 @@
-
 <?php
+  require_once('classes/core.php');
 
-function connect_to_db()
-{
-  $link = mysqli_connect("localhost","root","pass","anojing") or die("Error " . mysqli_error($link));
-  return $link;
-}
+  // Exception handling
+  set_exception_handler('exception_handler');
+  function exception_handler( $exception )
+  {
+    echo $exception->getMessage();
+  }
 
-include_once('classes/entries.php');
+  $core = new Core();
 
-$entries = new Entries();
-$entries = $entries->getEntries();
+  //$route = new Route();
+  $core->route->add('/', 'showPosts@Post');
+  $core->route->add('/admin', 'showLogin@Admin');
 
-var_dump($entries);
-
-// Error reporting is turned up to 11 for the purposes of this demo
-ini_set("display_errors",1);
-ERROR_REPORTING(E_ALL);
-
-// Exception handling
-set_exception_handler('exception_handler');
-function exception_handler( $exception )
-{
-  echo $exception->getMessage();
-}
-
-// Load the Template class
-require_once 'classes/template.php';
-
-// Create a new instance of the Template class
-$template = new Template;
-
-// Set the testing template file location
-$template->template_file = 'template-test.inc';
-
-$template->entries[] = (object) array( 'test' => 'This was inserted using template tags!' );
-$extra = (object) array(
-  'header' => (object) array( 'headerStuff' => 'Some extra content.' ),
-  'footer' => (object) array( 'footerStuff' => 'More extra content.' )
-);
-
-// Output the template markup
-echo $template->generate_markup($extra);
+?>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Ziro Faks</title>
+    <link rel="stylesheet" href="css/style.css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="css/admin-style.css" media="screen" charset="utf-8">
+  </head>
+  <body>
+    <?php $core->route->submit(); ?>
+  </body>
+</html>

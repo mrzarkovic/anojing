@@ -59,7 +59,6 @@ class Template
     {
       throw new Exception( 'No default template found' );
     }
-
     // Load the contents of the file and return them
     $this->_template = file_get_contents($path);
   }
@@ -79,11 +78,6 @@ class Template
 
     // Extract the main entry loop from the file
     $pattern = '#.*{loop}(.*?){/loop}.*#is';
-    $entry_template = preg_replace($pattern, "$1", $template);
-
-    // Extract foreach loops
-    $loops = array();
-    $loop_pattern = '#.*{loop}(.*?){/loop}.*#is';
     $entry_template = preg_replace($pattern, "$1", $template);
 
     // Extract the header from the template if one exists

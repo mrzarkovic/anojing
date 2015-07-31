@@ -1,10 +1,23 @@
 <?php
 
-  class Post
+  class Post extends Core
   {
     function __construct()
     {
-      echo "this is Post controller";
+      parent::__construct();
+      //echo $this->showPosts();
+    }
+
+    public function showPosts()
+    {
+      $posts = $this->getPosts();
+      $this->setTemplate("posts.inc");
+
+      foreach ( $posts as $post )
+        $this->template->entries[] = $post;
+
+      echo $this->template->generate_markup();
+
     }
 
     public function getPosts()

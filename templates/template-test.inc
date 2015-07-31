@@ -4,15 +4,7 @@
 
 {loop} // Entry data will be processed here
 
-  This is content that should be displayed.
-  {test}
-  <ul>
-  {% for element in array %}
-    <li>
-      {element}
-    </li>
-  {% endfor %}
-  </ul>
+  <div>{test}<div>
 
 {/loop}
 
