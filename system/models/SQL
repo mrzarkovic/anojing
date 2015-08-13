@@ -1,0 +1,21 @@
+CREATE TABLE `anojing`.`makes` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+CREATE TABLE `anojing`.`models` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `make_id` INT(11) NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+ALTER TABLE `anojing`.`models`
+ADD INDEX `make_id_fk_idx` (`make_id` ASC);
+ALTER TABLE `anojing`.`models`
+ADD CONSTRAINT `make_id_fk`
+  FOREIGN KEY (`make_id`)
+  REFERENCES `anojing`.`makes` (`id`)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE;
