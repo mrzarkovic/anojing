@@ -63,19 +63,17 @@
           && ( $user->check_password( $password ) )
           )
       {
-          $this->session->set_userdata('logged_in', TRUE);
-          $this->session->set_userdata('username', $_POST['username']);
+          //$this->session->set_userdata('logged_in', TRUE);
+          //$this->session->set_userdata('username', $_POST['username']);
 
-          if ($redir = $this->session->userdata('redir'))
-          {
-             $this->session->unset_userdata('redir');
-             header('Location: ' . $redir);
-             exit();
-          }
+          $_SESSION["logged_in"] = TRUE;
+          $_SESSION["username"] = $username;
+
+          return true;
       }
 
       return false;
-
+/*
       $link = connect_to_db();
       $query = "SELECT * FROM users" or die( "Error in the consult.." . mysqli_error( $link ) );
       $result = $link->query( $query );
@@ -97,6 +95,7 @@
           }
       }
       return false;
+*/
     }
 
     public function logout()
@@ -118,4 +117,3 @@
     }
 
   }
- ?>

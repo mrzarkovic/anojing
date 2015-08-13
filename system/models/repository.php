@@ -71,6 +71,42 @@ class Repository
 		}
 	}
 
+   static public function _get_pdo_data_type($type)
+	{
+		$type = strtolower($type);
+
+		switch ($type)
+		{
+			case 'int':
+			case 'bool':
+			case 'fk_or_null':
+				return PDO::PARAM_INT;
+			case 'string':
+			default:
+				return PDO::PARAM_STR;
+		}
+	}
+
+	static public function _get_value_by_pdo_data_type($value, $type)
+	{
+		$type = strtolower($type);
+
+		switch ($type)
+		{
+			case 'int':
+				return (int) $value;
+			case 'fk_or_null':
+				return ($value) ?: NULL;
+			case 'bool':
+				return (bool) $value;
+			case 'datetime':
+				return $value->format('Y-m-d H:i:s');
+			case 'string':
+			default:
+				return (string) $value;
+		}
+	}
+
    /**
     * Return record ID
     * @return int

@@ -44,9 +44,10 @@ class User extends Repository
     */
 	public function check_password($raw_password = '')
 	{
-		$this->load->library('Hash');
-
-		return (Hash::CheckPassword($raw_password, $this->pass) === TRUE);
+		if ( md5( $raw_password ) == $this->pass )
+         return true;
+      else
+         return false;
 	}
 
    /**
@@ -55,9 +56,7 @@ class User extends Repository
     */
 	public function hash_password($raw_password = '')
 	{
-		$this->load->library('Hash');
-
-		$this->pass = Hash::HashPassword($raw_password);
+		$this->pass = md5( $raw_password );
 
 		return $this->pass;
 	}

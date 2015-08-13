@@ -36,7 +36,7 @@
      */
     public function logged_in()
     {
-      if ( isset( $_SESSION["user"] ) )
+      if ( isset( $_SESSION["username"] ) )
         return true;
 
       return false;
