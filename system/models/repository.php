@@ -24,16 +24,15 @@ class Repository
 
       if ($this->connection === null) {
          $this->connection = new PDO(
-                 'mysql:host=localhost;dbname=anojing',
-                 'root',
-                 ''
+                 'mysql:host='.DB_HOST.';dbname='.DB_DB,
+                 DB_USER,
+                 DB_PASSWORD
              );
          $this->connection->setAttribute(
              PDO::ATTR_ERRMODE,
              PDO::ERRMODE_EXCEPTION
          );
       }
-
       if ( is_array( $row ) )
 			$this->_set_from_db( $row );
 		else
@@ -71,6 +70,42 @@ class Repository
 		}
 	}
 
+   static public function _get_pdo_data_type($type)
+	{
+		$type = strtolower($type);
+
+		switch ($type)
+		{
+			case 'int':
+			case 'bool':
+			case 'fk_or_null':
+				return PDO::PARAM_INT;
+			case 'string':
+			default:
+				return PDO::PARAM_STR;
+		}
+	}
+
+	static public function _get_value_by_pdo_data_type($value, $type)
+	{
+		$type = strtolower($type);
+
+		switch ($type)
+		{
+			case 'int':
+				return (int) $value;
+			case 'fk_or_null':
+				return ($value) ?: NULL;
+			case 'bool':
+				return (bool) $value;
+			case 'datetime':
+				return $value->format('Y-m-d H:i:s');
+			case 'string':
+			default:
+				return (string) $value;
+		}
+	}
+
    /**
     * Return record ID
     * @return int
@@ -78,6 +113,11 @@ class Repository
    public function get_id()
 	{
 		return $this->{static::$id_column};
+	}
+
+   public function set_id($id = 0)
+	{
+		return $this->{static::$id_column} = (int) $id;
 	}
 
    /**
@@ -233,6 +273,89 @@ class Repository
 		return FALSE;
 	}
 
+   public function add_to_db()
+	{
+		// set table
+		$table = static::TABLE_NAME;
+
+		// set fields and parameters
+		$columns = static::$columns;
+		$fields = array();
+
+		foreach ($columns as $column => $type)
+			$fields["`{$column}`"] = ":{$column}";
+
+		$insert_columns = implode(',', array_keys($fields) );
+		$parameters = implode(',', $fields);
+
+		$order_column = ( isset( static::$default_order_column ) ) ? static::$default_order_column : '';
+		$should_order = ( ! isset( static::$no_autoorder ) ) || ( ! static::$no_autoorder );
+
+		try
+		{
+			if ( $order_column && $should_order )
+				$this->{$order_column} = $this->get_new_order();
+
+			$stmt = $this->connection->prepare("INSERT INTO `{$table}`
+											({$insert_columns})
+										VALUES
+											({$parameters})");
+
+			foreach ($columns as $column => $type)
+			{
+				$parameter	= ":{$column}";
+
+				$value		= self::_get_value_by_pdo_data_type($this->{$column}, $type);
+				$data_type	= self::_get_pdo_data_type($type);
+
+				$stmt->bindValue($parameter, $value, $data_type);
+			}
+
+			$stmt->execute();
+
+			$stmt = $this->connection->query("SELECT LAST_INSERT_ID() AS `id`");
+			$row = $stmt->fetch(PDO::FETCH_ASSOC);
+			$this->set_id( $row['id'] );
+
+			return TRUE;
+		}
+		catch (PDOException $e)
+		{
+			$message = sprintf('Exception <%s> in file "%s" on line %s: %s', $e->getCode(), $e->getFile(), $e->getLine(), $e->getMessage());
+			$this->log->write_log('error', $message);
+		}
+
+		return FALSE;
+	}
+
+   public function delete_from_db()
+	{
+		// set table
+		$table = static::TABLE_NAME;
+
+		// set id param
+		$id_column = static::$id_column;
+		$id_param = "`{$id_column}` = :{$id_column}";
+
+		try
+		{
+			$stmt = $this->connection->prepare("DELETE FROM `{$table}`
+										WHERE {$id_param}");
+			$stmt->bindValue(":{$id_column}", $this->{$id_column}, PDO::PARAM_STR);
+
+			$stmt->execute();
+
+			return TRUE;
+		}
+		catch (PDOException $e)
+		{
+			$message = sprintf('Exception <%s> in file "%s" on line %s: %s', $e->getCode(), $e->getFile(), $e->getLine(), $e->getMessage());
+			$this->log->write_log('error', $message);
+		}
+
+		return FALSE;
+	}
+   /*
    public function save(\Post $post)
    {
       // set table
@@ -254,7 +377,7 @@ class Repository
       $stmt->bindParam(':posted_on', $post->posted_on);
       return $stmt->execute();
    }
-
+   */
    public function update(\Post $post)
    {
       // set table

@@ -1,5 +1,5 @@
 <section>
-  <h1>All of my <span>faks</span>!</h1>
+  <h1>All of my <span>posts</span>!</h1>
   <h2>just look at them, <a href="/login">or add some..</a></h2>
   {% for post in posts %}
   <article>
