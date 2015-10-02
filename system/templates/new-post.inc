@@ -11,6 +11,6 @@
     <input type="submit" name="post" value="Post it">
   </form>
   <a class="link" href="/">Home</a>
-  <a class="link" href="/list-posts">List of faks</a>
+  <a class="link" href="/edit-posts">List of faks</a>
   <a class="link" href="/logout">Log out</a>
 </section>

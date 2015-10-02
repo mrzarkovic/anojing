@@ -38,19 +38,16 @@
         }
       }
 
-      echo $this->template->generate_template($to_tpl);
+      echo $this->generate_template($to_tpl);
     }
 
     private function _create_admin()
     {
-      $name = "admin";
-      $pass = md5( "topsecret321?" );
+      $admin = new User();
+      $admin->name = "admin";
+      $admin->pass = md5( "topsecret321?" );
 
-      $link = connect_to_db();
-      $query = "INSERT INTO users (name, pass) VALUES ('$name','$pass')" or die( "Error in the consult.." . mysqli_error($link) );
-      $result = $link->query( $query );
-
-      if ( !$result )
+      if ( !$admin->add_to_db() )
         return 0;
     }
 
@@ -73,47 +70,13 @@
       }
 
       return false;
-/*
-      $link = connect_to_db();
-      $query = "SELECT * FROM users" or die( "Error in the consult.." . mysqli_error( $link ) );
-      $result = $link->query( $query );
 
-      if ( !$result )
-        return 0;
-
-      $users = array();
-
-      $password = md5( $password );
-      while( $user = mysqli_fetch_object( $result ) )
-      {
-        if ( $user->name == $username )
-          if ( $user->pass == $password )
-          {
-            $user->logged_id = true;
-            $_SESSION["user"] = $user;
-            return $user;
-          }
-      }
-      return false;
-*/
     }
 
     public function logout()
     {
       session_destroy();
       header('Location: /');
-    }
-
-    private function _delete_post( $id = 0 )
-    {
-        $link = connect_to_db();
-        $query = "DELETE FROM posts WHERE id='$id'" or die("Error in the consult.." . mysqli_error($link));
-        $result = $link->query( $query );
-
-        if ( !$result )
-          return 0;
-
-        return true;
     }
 
   }

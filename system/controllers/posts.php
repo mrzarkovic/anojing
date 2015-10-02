@@ -20,7 +20,7 @@
       $this->set_template("posts.inc");
       $to_tpl['posts'] = $posts->list;
 
-      return $this->template->generate_template($to_tpl);
+      return $this->generate_template($to_tpl);
     }
 
     /**
@@ -49,22 +49,23 @@
           $to_tpl['error'] = "Upload failed.";
         }
       }
-      return $this->template->generate_template($to_tpl);
+      return $this->generate_template($to_tpl);
     }
 
-    public function list_posts()
+    public function edit_posts()
     {
       if( !$this->logged_in() )
       {
         header('Location: /login');
       }
 
-      $this->set_template('list-posts.inc');
+      $this->set_template('edit-posts.inc');
 
-      $posts = $this->_get_posts();
-      $to_tpl['posts'] = $posts;
+      $posts = new Post();
+      $posts->fetch_all();
+      $to_tpl['posts'] = $posts->list;
 
-      return $this->template->generate_template($to_tpl);
+      return $this->generate_template($to_tpl);
     }
 
     public function delete_post( $post_id )
@@ -78,27 +79,27 @@
       $to_tpl['error'] = "";
       $to_tpl['notification'] = "";
 
-      $link = connect_to_db();
-      $query = "DELETE FROM posts WHERE id='$post_id'" or die("Error in the consult.." . mysqli_error($link));
-      $result = $link->query( $query );
+      $post = new Post();
+      $post->fetch_by_id($post_id);
 
-      if ( !$result )
+      if ($post->delete_from_db())
       {
-        $to_tpl['error'] = "Oops, there has been an error deleting the post.";
+         $to_tpl['notification'] = "The post has been deleted. Forever!";
       }
       else
       {
-        $to_tpl['notification'] = "The post has been deleted. Forever!";
+         $to_tpl['error'] = "Oops, there has been an error deleting the post.";
       }
 
-      return $this->template->generate_template($to_tpl);
+      return $this->generate_template($to_tpl);
+
     }
 
     private function _new_post()
     {
       $target_dir = "photos/";
       $target_file = $target_dir . basename($_FILES["photo"]["name"]);
-      $upload_ok = 1;
+
       $file_type = pathinfo( $target_file, PATHINFO_EXTENSION );
 
       if ( $_FILES["photo"]["tmp_name"] == "" )
@@ -108,39 +109,20 @@
 
       if( $check = getimagesize( $_FILES["photo"]["tmp_name"] ) )
       {
-        $link = connect_to_db();
 
         $title = $_POST['title'];
         $title = mysql_escape_string( $title );
         $photo_name = basename($_FILES["photo"]["name"]);
         $photo_ext = $file_type;
 
-        $datetime = new DateTime();
-        $datetime = $datetime->format('Y-m-d H:i:s');
+        $post = new Post();
+        $post->title       = $title;
+        $post->photo_name  = $photo_name;
+        $post->photo_ext   = $photo_ext;
 
-        $query = "INSERT INTO posts (title, photo_name, photo_ext, posted_on) VALUES ('$title','$photo_name','$photo_ext','$datetime')" or die("Error in the consult.." . mysqli_error($link));
-        $result = $link->query( $query );
-
-        if ( !$result )
-          return 0;
-
-        $upload_ok = 1;
-      }
-      else
-      {
-        //echo "File is not an image.";
-        $upload_ok = 0;
-      }
-
-      if ( $upload_ok == 0 )
-      {
-        return false;
-      }
-      else
-      {
         if ( move_uploaded_file( $_FILES["photo"]["tmp_name"], $target_file ) )
         {
-          return true;
+          return $post->add_to_db();
         }
         else
         {
@@ -149,24 +131,6 @@
       }
 
       return false;
-    }
-
-    private function _get_posts()
-    {
-      $posts = array();
-      $link = connect_to_db();
-      $query = "SELECT * FROM posts ORDER BY posted_on DESC" or die("Error in the consult.." . mysqli_error($link));
-      $result = $link->query( $query );
-
-      if (!$result)
-        return 0;
-
-      while( $row = mysqli_fetch_object( $result ) )
-      {
-        $posts[] = $row;
-      }
-
-      return $posts;
     }
   }
 
